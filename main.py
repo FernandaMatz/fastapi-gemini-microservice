@@ -13,6 +13,12 @@ from pydantic import ValidationError
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+import os
+import sys
+
+# Garante que o diretório atual do projeto está no PYTHONPATH do ambiente do Render/Linux
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from config import settings
 from database import get_db, init_db
 from models import InsightDiario, LogAuditoria, Venda
@@ -24,8 +30,13 @@ from schemas import (
     LogAuditoriaResponse,
     VendaCreate,
 )
-from services.ai import gerar_insight_executivo
-from services.audit import auditar_venda_diaria
+
+try:
+    from services.ai import gerar_insight_executivo
+    from services.audit import auditar_venda_diaria
+except ModuleNotFoundError:
+    from ai import gerar_insight_executivo
+    from audit import auditar_venda_diaria
 
 # Configuração de logging estruturado
 logging.basicConfig(
